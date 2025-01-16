@@ -9,3 +9,6 @@ http :3001/api/persons/2
 
 # Attempt to get an entry when id is not present (step 3)
 http :3001/api/persons/not_an_id
+
+# Delete an entry
+http DELETE :3001/api/persons/2
