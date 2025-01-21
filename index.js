@@ -73,6 +73,24 @@ app.post('/api/persons', (request, response) => {
   person.save().then(saved => response.json(saved))
 })
 
+app.patch('/api/persons/:id', (request, response, next) => {
+  const number = request.body.number
+
+  if (!number) {
+    return response.status(400).json({ error: 'number missing' })
+  }
+
+  Person.findByIdAndUpdate(request.params.id, { number }, { new: true })
+    .then(updated => {
+      if (updated) {
+        response.json(updated)
+      } else {
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
+})
+
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
     .then(result => response.status(204).end())
