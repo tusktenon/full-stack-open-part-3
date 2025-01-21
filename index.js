@@ -6,31 +6,6 @@ const Person = require('./models/person')
 
 const app = express()
 
-/*
-let persons = [
-  {
-    id: '1',
-    name: 'Arto Hellas',
-    number: '040-123456',
-  },
-  {
-    id: '2',
-    name: 'Ada Lovelace',
-    number: '39-44-5323523',
-  },
-  {
-    id: '3',
-    name: 'Dan Abramov',
-    number: '12-43-234345',
-  },
-  {
-    id: '4',
-    name: 'Mary Poppendieck',
-    number: '39-23-6423122',
-  },
-]
-*/
-
 app.use(cors())
 app.use(express.static('dist'))
 app.use(express.json())
@@ -64,8 +39,11 @@ app.get('/api/persons/:id', (request, response) => {
   Person.findById(request.params.id)
     .then(person => response.json(person))
     .catch(error => {
-      console.log(`GET /api/persons/${request.params.id}:`, error.message)
-      response.status(404).end()
+      console.error(
+        `GET /api/persons/${request.params.id} (${error.name}):`,
+        error.message,
+      ),
+        response.status(400).end()
     })
 })
 
@@ -85,8 +63,15 @@ app.post('/api/persons', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  persons = persons.filter(p => p.id !== request.params.id)
-  response.status(204).end()
+  Person.findByIdAndDelete(request.params.id)
+    .then(result => response.status(204).end())
+    .catch(error => {
+      console.error(
+        `DELETE /api/persons/${request.params.id} (${error.name}):`,
+        error.message,
+      ),
+        response.status(400).end()
+    })
 })
 
 const PORT = process.env.PORT
