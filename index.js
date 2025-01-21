@@ -6,6 +6,17 @@ const Person = require('./models/person')
 
 const app = express()
 
+const errorHandler = (error, request, response, next) => {
+  const { name, message } = error
+  console.error(`${name}: ${message}`)
+
+  if (name === 'CastError') {
+    return response.status(400).json({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
 app.use(cors())
 app.use(express.static('dist'))
 app.use(express.json())
@@ -35,16 +46,16 @@ app.get('/api/persons', (request, response) => {
   Person.find({}).then(people => response.json(people))
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
-    .then(person => response.json(person))
-    .catch(error => {
-      console.error(
-        `GET /api/persons/${request.params.id} (${error.name}):`,
-        error.message,
-      ),
-        response.status(400).end()
+    .then(person => {
+      if (person) {
+        response.json(person)
+      } else {
+        response.status(404).end()
+      }
     })
+    .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
@@ -62,17 +73,13 @@ app.post('/api/persons', (request, response) => {
   person.save().then(saved => response.json(saved))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
     .then(result => response.status(204).end())
-    .catch(error => {
-      console.error(
-        `DELETE /api/persons/${request.params.id} (${error.name}):`,
-        error.message,
-      ),
-        response.status(400).end()
-    })
+    .catch(error => next(error))
 })
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
