@@ -80,14 +80,8 @@ app.post('/api/persons', (request, response) => {
     return response.status(400).json({ error: 'number missing' })
   }
 
-  if (persons.some(p => p.name === name)) {
-    return response.status(409).json({ error: 'name must be unique' })
-  }
-
-  const id = String(Math.floor(Math.random() * 1_000_000))
-  const person = { id, name, number }
-  persons.push(person)
-  response.json(person)
+  const person = new Person({ name, number })
+  person.save().then(saved => response.json(saved))
 })
 
 app.delete('/api/persons/:id', (request, response) => {
