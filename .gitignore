@@ -1,1 +1,4 @@
 node_modules
+
+# Do not save your MongoDB password in version control!
+.env
