@@ -33,9 +33,10 @@ function displayAllEntries() {
 
 function addEntry(name, number) {
   const person = new Person({ name, number })
-  return person.save().then(() => {
-    console.log(`added ${name} number ${number} to phonebook`)
-  })
+  return person
+    .save()
+    .then(() => console.log(`added ${name} number ${number} to phonebook`))
+    .catch(error => console.log(error.message))
 }
 
 function handleArgsError() {
