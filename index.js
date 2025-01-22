@@ -32,15 +32,8 @@ app.use(cors())
 app.use(express.static('dist'))
 app.use(express.json())
 
-morgan.token('post-content', req =>
-  req.method === 'POST' ? JSON.stringify(req.body) : '',
-)
-
-app.use(
-  morgan(
-    ':method :url :status :res[content-length] - :response-time ms :post-content',
-  ),
-)
+morgan.token('request-content', req => JSON.stringify(req.body))
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :request-content'))
 
 app.get('/', (request, response) => {
   response.send('<h1>Phonebook Server</h1>')
