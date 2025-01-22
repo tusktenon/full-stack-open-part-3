@@ -1,10 +1,18 @@
 const express = require('express')
 const cors = require('cors')
 require('dotenv').config()
+const mongoose = require('mongoose')
 const morgan = require('morgan')
 const Person = require('./models/person')
 
 const app = express()
+
+const mongoURL = process.env.MONGODB_URI
+console.log('connecting to MongoDB...')
+mongoose
+  .connect(mongoURL)
+  .then(() => console.log('connection established'))
+  .catch(error => console.log('connection failed:', error.message))
 
 const errorHandler = (error, request, response, next) => {
   const { name, message } = error
